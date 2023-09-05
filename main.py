@@ -1,22 +1,25 @@
 import random
 from tkinter import *
-import csv
+
 import pandas
 
 BACKGROUND_COLOR = "#B1DDC6"
 LANGUAGE_FONT = ("Arial", 20, "italic")
 WORD_FONT = ("Arial", 40, "bold")
-current_card = {}
+
 
 data = pandas.read_csv("french_words.csv")
 to_learn = data.to_dict(orient= "records")
-
+current_card = {}
+print(to_learn)
 def next_card():
-  global current_card
+  global current_card, flip_timer
+  window.after_cancel(flip_timer)
   current_card = random.choice(to_learn)
-  canvas.itemconfig(language, text= "French")
+  canvas.itemconfig(language, text= "French", fill= "black")
   canvas.itemconfig(word, text= current_card["French"])
   canvas.itemconfig(front_img, image= card_front)
+  flip_timer = window.after(3000, func= flip_card)
 
 def flip_card():
   canvas.itemconfig(front_img, image=card_back)
@@ -29,7 +32,7 @@ def flip_card():
 window = Tk()
 window.title("Flashy")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
-window.after(3000, func= flip_card)
+flip_timer = window.after(3000, func= flip_card)
 
 #creates first card and text on it
 canvas = Canvas(width=800, height=526, highlightthickness=0)
@@ -54,6 +57,7 @@ button_right = Button(image=image_right,
                       highlightthickness=0,
                       bg=BACKGROUND_COLOR, command= next_card)
 button_right.grid(column=1, row=1)
-
 next_card()
+
+
 window.mainloop()
